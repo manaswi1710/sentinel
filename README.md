@@ -44,12 +44,12 @@ Our custom RegEx parser intelligently scans codebases for:
 ```mermaid
 graph TD
     A[User Inputs GitHub URL] --> B[FastAPI Backend]
-    B --> C{Parser Engine}
-    C -->|Extract Dependencies| D[pypi.org & npmjs.com API]
-    D -->|Status 404?| E[🔴 HALLUCINATION DETECTED]
-    D -->|Status 200?| F[Typosquatting Check]
-    F -->|Levenshtein >= 85%| G[🟠 TYPOSQUATTING RISK]
-    F -->|Levenshtein < 85%| H[🟢 SAFE PACKAGE]
+    B --> C{Registry Check}
+    C -->|Status 404 Not Found| D[🔴 CRITICAL: Hallucination]
+    C -->|Status 200 OK| E{Levenshtein Check}
+    E -->|Ratio == 100%| F[🟢 SAFE: Exact Match]
+    E -->|Ratio >= 85%| G[🟠 HIGH RISK: Typosquatting]
+    E -->|Ratio < 85%| H[🟢 SAFE: Unique Package]
 ```
 
   ---
