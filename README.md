@@ -75,8 +75,8 @@ Follow these steps to run Sentinel locally for testing.
 ### 1. Clone the Repository
 
 ```Bash
-git clone https://github.com/manaswi1710/senitel.git
-cd senitel
+git clone https://github.com/manaswi1710/sentinel.git
+cd sentinel
 ```
 ### 2. Setup Backend (FastAPI)
 
