@@ -27,8 +27,7 @@ $$
 
 * **Implementation:** Our backend leverages the `rapidfuzz` library, which provides C++ optimized string matching for near-instantaneous processing of large repositories.
 * **Strategic Thresholding:**
-    * **Ratio > 95%:** Flagged as **CRITICAL**. This high threshold identifies intentional typosquatting (e.g., `reqests` vs `requests`).
-    * **Ratio 85-95%:** Flagged as **WARNING**. This catches "Confusable" names that may lead to dependency confusion attacks.
+    * **Ratio >= 85%:** Flagged as **HIGH RISK**. This threshold identifies potential typosquatting (e.g., `reqests` vs `requests`) where the package name is dangerously similar to a known popular library.
 
 ### B. Registry Verification Protocol
 We perform real-time lookups using the official PyPI and NPM JSON APIs to ensure the ground truth of a package's existence.
