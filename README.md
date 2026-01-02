@@ -122,8 +122,40 @@ We believe that security tools must be transparent. Our detection logic is based
 * **Malware Analysis:** Deep scanning of the package code itself, not just the name.
 
 ---
+### 1. High-Level System Diagram
+This diagram outlines how our frontend, backend, and external services interact to ensure low latency and high availability.
+
+```mermaid
+graph TD
+    User["User / Client"] -->|HTTPS Request| LB["Load Balancer (Nginx)"]
+    LB -->|Distributes Traffic| API["FastAPI Server Cluster"]
+
+    subgraph Internal_Infrastructure
+    API -->|Read/Write| Cache[("Redis Cache")]
+    API -->|Queue Jobs| Worker["Async Workers (Celery)"]
+    end
+
+    subgraph External_World
+    Worker -->|Verify Package| PYPI[PyPI API]
+    Worker -->|Verify Package| NPM[NPM API]
+    end
+
+    Worker -->|Return Analysis| API
+    API -->|JSON Report| User
+```
+### 2. Handling Growth (Scalability)
+* **Redis Caching Layer:** To handle more users, we will cache API responses from PyPI/NPM for 24 hours. If 1,000 users scan "react", we only hit the external API *once*, serving the other 999 requests instantly from cache.
+* **Asynchronous Processing:** Scanning large repositories (100+ files) can be slow. We will offload deep scanning to **Celery Workers** so the user's interface never freezes.
+* **Horizontal Scaling:** Since our backend is stateless (FastAPI), we can easily spin up multiple instances behind a Load Balancer (Nginx) to handle traffic spikes.
+
+### 3. Avoiding Failures (Reliability)
+* **Rate Limit Handling:** If PyPI blocks us for too many requests, our system implements **Exponential Backoff** (retrying after 1s, 2s, 4s) rather than crashing.
+* **Fallback Logic:** If the external registry APIs go down, Sentinel will fall back to its internal "Safe List" database to ensure basic security checks can still continue.
+* **Containerization:** The entire system is Dockerized (see `docker-compose.yml`), ensuring it runs identically on any server, preventing "it works on my machine" crashes.
+---
 
 ## 👥 The Team
+
 Built with 💻 and ☕ for **Hack The Winter 2025**.
 
 | Team Member | Role & Key Contributions |
